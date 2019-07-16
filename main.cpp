@@ -12,7 +12,7 @@
 using namespace std;
 
 #define M 4
-// This means N by N cube
+// This means M by M by M cube
 
 #define N (M + 2)
 #define mp make_pair
