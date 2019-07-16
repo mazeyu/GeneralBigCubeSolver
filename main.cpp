@@ -7,10 +7,14 @@
 #include <ctime>
 #include <thread>
 #include <fstream>
+#include <algorithm>
 
 using namespace std;
 
-#define N 9
+#define M 4
+// This means N by N cube
+
+#define N (M + 2)
 #define mp make_pair
 #define rep(i, l, r) for (int i = l; i < r; i++)
 #define rep_(i, l, r) for (i = l; i < r; i++)
@@ -557,24 +561,31 @@ state apply(state s, alg al) {
     return s;
 }
 
+auto fstate = ofstream("state.txt");
+
+void cout_(char ch) {
+    if (ch == 'o' || ch == 'r' || ch == 'g' || ch == 'b' || ch == 'y' || ch == 'w') {
+        fstate << ch << " ";
+    }
+}
 
 void show(state State) {
-    rep(i, 0, N) {
-        rep(j, 0, N) cout << " ";
-        rep(j, 0, N) cout << State.a[i][j][N - 1];
-        cout << endl;
+    rep(i, 1, N - 1) {
+        rep(j, 0, N) fstate << " ";
+        rep(j, 0, N) cout_( State.a[i][j][N - 1]);
+        fstate << endl;
     }
-    rep(i, 0, N) {
-        rep(j, 0, N) cout << State.a[j][0][N - 1 - i];
-        rep(j, 0, N) cout << State.a[N - 1][j][N - 1 - i];
-        rep(j, 0, N) cout << State.a[N - 1 - j][N - 1][N - 1 - i];
-        rep(j, 0, N) cout << State.a[0][N - 1 - j][N - 1 - i];
-        cout << endl;
+    rep(i, 1, N - 1) {
+        rep(j, 0, N) cout_(State.a[j][0][N - 1 - i]);
+        rep(j, 0, N) cout_(State.a[N - 1][j][N - 1 - i]);
+        rep(j, 0, N) cout_(State.a[N - 1 - j][N - 1][N - 1 - i]);
+        rep(j, 0, N) cout_(State.a[0][N - 1 - j][N - 1 - i]);
+        fstate << endl;
     }
-    for (int i = N - 1; i >= 0; i--) {
-        rep(j, 0, N) cout << " ";
-        rep(j, 0, N) cout << State.a[i][j][0];
-        cout << endl;
+    for (int i = N - 2; i >= 1; i--) {
+        rep(j, 0, N) fstate << " ";
+        rep(j, 0, N) cout_(State.a[i][j][0]);
+        fstate << endl;
     }
 }
 
@@ -1189,14 +1200,14 @@ void solveThree(state State) {
     State2 = State1;
     rep(i, 0, N) rep(j, 0, N) State2.a[i][j][N - 2] = State.a[i][j][N - 2];
     rep(i, 0, N) rep(j, 0, N) State1.a[i][j][N - 2] = State1.a[i][j][1];
-    show(State2);
-    show(State1);
+//    show(State2);
+//    show(State1);
     al = bd_bfs(State2, State1, lazySet2, 999);
     print(al, f3);
 
 }
 
-int main() {
+int main(int argc, char *argv[]) {
     srand(time(0));
     init();
 
@@ -1211,14 +1222,127 @@ int main() {
 //        f.close();
 //        show(State);
 //    } else {
+
+
+
     f = ofstream("alg.txt");
     start = clock();
     auto al = randomAlg();
 
-    print(al, f);
-    f << endl;
-    f << "R R R R R R R R R R R R" << endl;
+////    print(al, f);
+//    f << endl;
+//    f << "R R R R R R R R R R R R" << endl;
     State = apply(State, al);
+
+
+
+    if (argc == 2) {
+
+        auto ff = ifstream(string(argv[1]));
+
+        int n = N - 2;
+        map<char, int> colorMap;
+        rep(i, 0, 6) colorMap[colors[i]] = i;
+
+
+
+//    void show(state State) {
+//        rep(i, 1, N - 1) {
+//            rep(j, 0, N) cout << " ";
+//            rep(j, 0, N) cout_( State.a[i][j][N - 1]);
+//            cout << endl;
+//        }
+//        rep(i, 1, N - 1) {
+//            rep(j, 0, N) cout_(State.a[j][0][N - 1 - i]);
+//            rep(j, 0, N) cout_(State.a[N - 1][j][N - 1 - i]);
+//            rep(j, 0, N) cout_(State.a[N - 1 - j][N - 1][N - 1 - i]);
+//            rep(j, 0, N) cout_(State.a[0][N - 1 - j][N - 1 - i]);
+//            cout << endl;
+//        }
+//        for (int i = N - 2; i >= 1; i--) {
+//            rep(j, 0, N) cout << " ";
+//            rep(j, 0, N) cout_(State.a[i][j][0]);
+//            cout << endl;
+//        }
+//    }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = 1 + i;
+                int y = 1 + j;
+                int z = n + 1;
+                State.a[x][y][z] = ch;
+            }
+
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = 1 + j;
+                int y = 0;
+                int z = n - i;
+                State.a[x][y][z] = ch;
+            }
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = n + 1;
+                int y = 1 + j;
+                int z = n - i;
+                State.a[x][y][z] = ch;
+            }
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = n - j;
+                int y = n + 1;
+                int z = n - i;
+                State.a[x][y][z] = ch;
+            }
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = 0;
+                int y = n - j;
+                int z = n - i;
+                State.a[x][y][z] = ch;
+            }
+        }
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                char ch;
+                ff >> ch;
+
+                while (ch == ' ' || ch == '\n') ff >> ch;
+                int c = (colorMap[ch]);
+                int x = n - i;
+                int y = 1 + j;
+                int z = 0;
+                State.a[x][y][z] = ch;
+            }
+
+        }
+    }
     show(State);
     State = solveCenter(State);
 
